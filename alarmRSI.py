@@ -80,13 +80,13 @@ while 1:
         data = pyupbit.get_ohlcv(ticker=tickers[i], interval="minute5")
         now_rsi = rsi(data, 14).iloc[-1]
         if now_rsi < 30 and tickers[i] != 'KRW-BTT':
-            krw = get_balance("KRW")
-            if krw > 5000:
-                upbit.buy_market_order(tickers[i], 100000)
-                target_price = get_profit_price(tickers[i]) # +2%
-                upbit.sell_limit_order(tickers[i], target_price, get_balance(tickers[i][4:]))
+            # krw = get_balance("KRW")
+            # if krw > 5000:
+            #     upbit.buy_market_order(tickers[i], 100000)
+            #     target_price = get_profit_price(tickers[i]) # +2%
+            #     upbit.sell_limit_order(tickers[i], target_price, get_balance(tickers[i][4:]))
             #print(datetime.datetime.now(), now_rsi)
-            #bot.sendMessage(mc, tickers[i])
+            bot.sendMessage(mc, tickers[i])
             #print(tickers[i])
             #print('RSI : ', now_rsi)
         time.sleep(0.05)

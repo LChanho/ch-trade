@@ -28,10 +28,9 @@ while 1:
     for i in range(len(tickers)):
         data = pyupbit.get_ohlcv(ticker=tickers[i], interval="minute5")
         now_rsi = rsi(data, 14).iloc[-1]
-        if now_rsi < 40:
-        #if now_rsi < 30 and tickers[i] != 'KRW-BTT':
-            print(datetime.datetime.now(), now_rsi)
+        if now_rsi < 30 and tickers[i] != 'KRW-BTT':
             bot.sendMessage(mc, tickers[i])
-            print(tickers[i])
-            print('RSI : ', now_rsi)
-        time.sleep(0.1)
+            #print(datetime.datetime.now(), now_rsi)
+            #print(tickers[i])
+            #print('RSI : ', now_rsi)
+        time.sleep(0.05)

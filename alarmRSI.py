@@ -30,7 +30,7 @@ def get_balance(ticker):
     return 0
 
 def get_profit_price(ticker):
-    price = round(get_current_price(ticker)*1.02)
+    price = round(get_current_price(ticker)*1.01)
     price = price - (price % get_hoga(price))
     return price
 
@@ -79,12 +79,12 @@ while 1:
     for i in range(len(tickers)):
         data = pyupbit.get_ohlcv(ticker=tickers[i], interval="minute5")
         now_rsi = rsi(data, 14).iloc[-1]
-        if now_rsi < 30 and tickers[i] != 'KRW-BTT':
-            # krw = get_balance("KRW")
-            # if krw > 5000:
-            #     upbit.buy_market_order(tickers[i], 100000)
-            #     target_price = get_profit_price(tickers[i]) # +2%
-            #     upbit.sell_limit_order(tickers[i], target_price, get_balance(tickers[i][4:]))
+        if now_rsi < 30 and tickers[i] != 'KRW-BTT' and get_balance(tickers[i]) < 5000:
+            krw = get_balance("KRW")
+            if krw > 5000:
+                upbit.buy_market_order(tickers[i], 200000)
+                target_price = get_profit_price(tickers[i]) # +1%
+                upbit.sell_limit_order(tickers[i], target_price, get_balance(tickers[i][4:]))
             #print(datetime.datetime.now(), now_rsi)
             bot.sendMessage(mc, tickers[i])
             #print(tickers[i])

@@ -20,6 +20,8 @@ def rsi(ohlc: pandas.DataFrame, period:int = 14) :
 
 def get_balance(ticker):
     """잔고 조회"""
+    if 'KRW' in ticker:
+        ticker = ticker[4:]
     balances = upbit.get_balances()
     for b in balances:
         if b['currency'] == ticker:
@@ -30,7 +32,9 @@ def get_balance(ticker):
     return 0
 
 def get_avg_buy_price(ticker):
-    """잔고 조회"""
+    """매수가 조회"""
+    if 'KRW' in ticker:
+        ticker = ticker[4:]
     balances = upbit.get_balances()
     for b in balances:
         if b['currency'] == ticker:
@@ -83,6 +87,8 @@ bot = telepot.Bot(token)
 access = "4eBjPLU8uWxUxE1Axi59axxzHG2AXZZENSJgYJ65"
 secret = "88SvYJoj9em7w7XlV9DCqjNItfXuZtpjJxdfZ91n"
 upbit = pyupbit.Upbit(access, secret)
+
+print(get_avg_buy_price('KRW-MATIC'))
 
 while 1:
     for i in range(len(tickers)):

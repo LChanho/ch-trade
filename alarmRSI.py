@@ -29,6 +29,17 @@ def get_balance(ticker):
                 return 0
     return 0
 
+def get_avg_buy_price(ticker):
+    """잔고 조회"""
+    balances = upbit.get_balances()
+    for b in balances:
+        if b['currency'] == ticker:
+            if b['avg_buy_price'] is not None:
+                return float(b['avg_buy_price'])
+            else:
+                return 0
+    return 0
+
 def get_profit_price(ticker):
     price = round(get_current_price(ticker)*1.01)
     price = price - (price % get_hoga(price))
@@ -73,8 +84,6 @@ access = "4eBjPLU8uWxUxE1Axi59axxzHG2AXZZENSJgYJ65"
 secret = "88SvYJoj9em7w7XlV9DCqjNItfXuZtpjJxdfZ91n"
 upbit = pyupbit.Upbit(access, secret)
 
-krw = get_balance("KRW")
-
 while 1:
     for i in range(len(tickers)):
         data = pyupbit.get_ohlcv(ticker=tickers[i], interval="minute5")
@@ -82,11 +91,17 @@ while 1:
         if now_rsi < 30 and tickers[i] != 'KRW-BTT' and get_balance(tickers[i]) < 5000:
             krw = get_balance("KRW")
             if krw > 5000:
-                upbit.buy_market_order(tickers[i], 200000)
-                target_price = get_profit_price(tickers[i]) # +1%
-                upbit.sell_limit_order(tickers[i], target_price, get_balance(tickers[i][4:]))
+                upbit.buy_market_order(tickers[i], 100000)
+        if get_balance(tickers[i]) > 0 and get_current_price(tickers[i]) > get_avg_buy_price(tickers[i]) * 1.02:
+            upbit.sell_market_order(tickers[i], get_balance(tickers[i]))
+            bot.sendMessage(mc, tickers[i] + '익절')
+        elif get_balance(tickers[i]) > 0 and get_current_price(tickers[i]) < get_avg_buy_price(tickers[i]) * 0.98:
+            upbit.sell_market_order(tickers[i], get_balance(tickers[i]))
+            bot.sendMessage(mc, tickers[i] + '손절')
+                #target_price = get_profit_price(tickers[i]) # +1%
+                #upbit.sell_limit_order(tickers[i], target_price, get_balance(tickers[i][4:]))
             #print(datetime.datetime.now(), now_rsi)
-            bot.sendMessage(mc, tickers[i])
+            #bot.sendMessage(mc, tickers[i])
             #print(tickers[i])
             #print('RSI : ', now_rsi)
         time.sleep(0.05)

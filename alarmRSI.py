@@ -91,7 +91,22 @@ def get_start_time(ticker):
     start_time = df.index[0]
     return start_time
 
-#tickers = pyupbit.get_tickers(fiat='KRW')
+def checkProfitLoss():
+    balances = upbit.get_balances()
+    for i in range(len(balances)):
+        if 'KRW' not in balances[i]['currency']:
+            ticker = 'KRW-' + balances[i]['currency']
+            current_price = get_current_price('KRW-'+ balances[i]['currency'])
+            avg_buy_price = balances[i]['avg_buy_price']
+            if float(current_price) > float(avg_buy_price) * 1.02:
+                upbit.sell_market_order(ticker, balances[i]['balance'])
+                bot.sendMessage(mc, ticker + '익절')
+            elif float(current_price) < float(avg_buy_price) * 0.98:
+                upbit.sell_market_order(ticker, balances[i]['balance'])
+                bot.sendMessage(mc, ticker + '손절')
+        time.sleep(0.05)
+
+
 tickers = realtimeRank(30)
 
 token = '5008461782:AAEqAxUVEIKOYhZAr4gvj1UIqNkN1tCvD7k'
@@ -102,37 +117,21 @@ access = "4eBjPLU8uWxUxE1Axi59axxzHG2AXZZENSJgYJ65"
 secret = "88SvYJoj9em7w7XlV9DCqjNItfXuZtpjJxdfZ91n"
 upbit = pyupbit.Upbit(access, secret)
 
-# print(get_avg_buy_price('KRW-STEEM'))
-# print(get_balance('KRW-STEEM'))
-# print(get_current_price('KRW-STEEM'))
-
-start_time = get_start_time("KRW-ADA") # 09:00
-print(start_time)
+start_time = get_start_time('KRW-ADA') # 09:00
 
 while 1:
     for i in range(len(tickers)):
         data = pyupbit.get_ohlcv(ticker=tickers[i], interval="minute5")
         now_rsi = rsi(data, 14).iloc[-1]
-        if now_rsi < 30 and tickers[i] != 'KRW-BTT' and get_balance(tickers[i]) < 5000:
+        if now_rsi < 30 and tickers[i] != 'KRW-BTT' and get_balance(tickers[i]) == 0:
             krw = get_balance("KRW")
             if krw > 5000:
-                upbit.buy_market_order(tickers[i], 10000)
+                upbit.buy_market_order(tickers[i], 100000)
                 bot.sendMessage(mc, tickers[i] + ' RSI 매수')
-        elif get_start_time("KRW-ADA") != start_time and get_target_price(tickers[i], 0.4) < get_current_price(tickers[i]) and get_balance(tickers[i]) < 5000:
+        elif get_start_time("KRW-ADA") != start_time and get_target_price(tickers[i], 0.4) < get_current_price(tickers[i]) and get_balance(tickers[i]) == 0:
             krw = get_balance("KRW")
             if krw > 5000:
-                upbit.buy_market_order(tickers[i], 10000)
+                upbit.buy_market_order(tickers[i], 100000)
                 bot.sendMessage(mc, tickers[i] + ' 돌파 매수')
-        if get_balance(tickers[i]) > 0 and get_current_price(tickers[i]) > get_avg_buy_price(tickers[i]) * 1.02:
-            upbit.sell_market_order(tickers[i], get_balance(tickers[i]))
-            bot.sendMessage(mc, tickers[i] + '익절')
-        elif get_balance(tickers[i]) > 0 and get_current_price(tickers[i]) < get_avg_buy_price(tickers[i]) * 0.98:
-            upbit.sell_market_order(tickers[i], get_balance(tickers[i]))
-            bot.sendMessage(mc, tickers[i] + '손절')
-                #target_price = get_profit_price(tickers[i]) # +1%
-                #upbit.sell_limit_order(tickers[i], target_price, get_balance(tickers[i][4:]))
-            #print(datetime.datetime.now(), now_rsi)
-            #bot.sendMessage(mc, tickers[i])
-            #print(tickers[i])
-            #print('RSI : ', now_rsi)
-        #time.sleep(0.02)
+        checkProfitLoss()
+        time.sleep(0.05)

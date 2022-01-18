@@ -100,10 +100,10 @@ def checkProfitLoss():
             avg_buy_price = balances[i]['avg_buy_price']
             if float(current_price) > float(avg_buy_price) * 1.02:
                 upbit.sell_market_order(ticker, balances[i]['balance'])
-                bot.sendMessage(mc, ticker + ' ' + str(current_price - avg_buy_price) + ' 익절')
+                bot.sendMessage(mc, ticker + ' 익절')
             elif float(current_price) < float(avg_buy_price) * 0.98:
                 upbit.sell_market_order(ticker, balances[i]['balance'])
-                bot.sendMessage(mc, ticker + ' ' + str(avg_buy_price - current_price) + ' 손절')
+                bot.sendMessage(mc, ticker + ' 손절')
         time.sleep(0.05)
 
 token = '5008461782:AAEqAxUVEIKOYhZAr4gvj1UIqNkN1tCvD7k'

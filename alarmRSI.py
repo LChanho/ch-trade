@@ -116,6 +116,8 @@ upbit = pyupbit.Upbit(access, secret)
 
 dolpa_list = []
 
+loop_start_time = get_start_time("KRW-ADA") # 09:00
+
 while 1:
     now = datetime.datetime.now()
     start_time = get_start_time("KRW-ADA") # 09:00
@@ -135,7 +137,7 @@ while 1:
                 upbit.buy_market_order(tickers[i], 100000)
                 bot.sendMessage(mc, tickers[i] + ' RSI 매수')
 
-        elif get_start_time("KRW-ADA") != start_time and get_target_price(tickers[i], 0.4) < get_current_price(tickers[i]) and get_balance(tickers[i]) == 0:
+        elif get_start_time("KRW-ADA") != loop_start_time and get_target_price(tickers[i], 0.4) < get_current_price(tickers[i]) and get_balance(tickers[i]) == 0:
             krw = get_balance("KRW")
             if krw > 5000 and tickers[i] not in dolpa_list:
                 upbit.buy_market_order(tickers[i], 100000)
